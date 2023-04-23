@@ -21,6 +21,7 @@ import copy
 import time
 import DataDescriptions
 import MoCapData
+import sys
 
 def trace( *args ):
     # uncomment the one you want to use
@@ -277,7 +278,10 @@ class NatNetClient:
             result.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             result.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, socket.inet_aton(self.multicast_address) + socket.inet_aton(self.local_ip_address))
             try:
-                result.bind((self.local_ip_address, port))
+                if sys.platform == "darwin" or sys.platform == "linux":
+                    result.bind((self.multicast_address, port))
+                else:
+                    result.bind((self.local_ip_address, port))
             except socket.error as msg:
                 print("ERROR: data socket error occurred:\n%s" %msg)
                 print("  Check Motive/Server mode requested mode agreement.  You requested Multicast ")
